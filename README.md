@@ -21,4 +21,4 @@ $ bin/rshell
 
 Notes
 -----------
-*HW 2 is the foundation of the terminal where the user will be able to enter basic commands such as: echo Hello and RSHELL will react according to the command. 
+* HW 2 is the foundation of the terminal where the user will be able to enter basic commands such as: echo Hello and RSHELL will react according to the command. 
