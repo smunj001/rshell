@@ -12,11 +12,11 @@ The program RSHELL is an open ended project which is a reproduction of a command
 
 Execution
 ------
-$ git clone https://github.com/smunj001/rshell.git
-$ cd rshell
-$ git checkout hw2
-$ make
-$ bin/rshell
+*      $ git clone https://github.com/smunj001/rshell.git
+*      $ cd rshell
+*      $ git checkout hw2
+*      $ make
+*      $ bin/rshell
 
 
 Notes
