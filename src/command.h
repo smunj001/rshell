@@ -27,56 +27,58 @@ class Command
         
 		void execute()
 		{
-			int num = arg.size() + 2;		//number of arguments + cmd + NULL
+			int num = arg.size() + 2;		
+			//number of arguments + cmd + NULL
+			
 			char* args[num];
 			
 			args[0] = (char*)cmd.c_str();
 			
-			for (int i = 1; i < arg.size() + 1; i++)//i starts at 1 b/c cmd already at 0
+			for (int i = 1; i < arg.size() + 1; i++) //i starts at 1 b/c cmd already at 0
 			{
-				args[i] = (char*)arg[i - 1].c_str();//arg[i-1] b/c we need to start at i=0 for vector<string> arg
+				args[i] = (char*)arg[i - 1].c_str();
+				//arg[i-1] b/c we need to start at i=0 for vector<string> arg
 			}
 			
 			args[num - 1] = NULL;
-			   int pid = fork();
+			int pid = fork();
 			  
-			   if (pid == 0)
-			   {
+			if (pid == 0)
+			{
 				executable = true;
 				if (execvp(args[0], args) == -1)
 				{
 					perror ("exec");
 					executable = false;
 					//cout << "set executable = false;" << endl;
-					
 					exit(1);
-                 }
-                 exit(0);
 				}
-			     else if ( pid > 0 )
-                {
-                    int status;
-                    
-                  	if(waitpid(pid, &status, 0) == -1)
-                  	{
+                 		exit(0);
+			}
+		        else if ( pid > 0 )
+                	{
+                    		int status;
+                  		if(waitpid(pid, &status, 0) == -1)
+                  		{
         			    perror("waitpid");
         			    exit(EXIT_FAILURE);
-                    }
-                }
+                    		}
+                	}
 		//syscalls fork, execvp, and waitpid.
-		
+		}
 		void clear()
 		{
 			cmd.clear();
 			arg.clear();
 			connect.clear();
-			// ~Command();
 		}
 
 		void parse(string& whole_command, vector<Command>& cmds)
 		{
-			string input;//tempstring
-			Command c;//tempcommand
+			string input;
+			//tempstring
+			Command c;
+			//tempcommand
 			
 			/*
 				We will be parsing the command passed by the user. We need the 'input' 
