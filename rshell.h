@@ -54,4 +54,48 @@ class Rshell : public Command
 		    
         }
         
+        void getInput()
+        {
+
+		while (true) 
+		//for some reason this while loop exits as soon as one of the commands executes
+		{
+	                cout << username << "@" << hostname << "$ ";  //This is the command prompt that will be printed
+	                getline(cin, input, '\n'); //Take in the whole input from the user
+	               
+	                if (input == "exit" || input == "EXIT") //if the input is exit then terminate
+	                {
+	                    exit(EXIT_FAILURE);
+	                }
+	                
+	                parse(input, temp);
+	                	 //at this point our parse only seperages cmds, args, and connectors if there is a space in between each of them
+	                    
+	                for (int i = 0; i < temp.size(); i++)
+	                {
+	                        if (i == 0)
+	                        {
+	                            //if first command is being executed
+	                            //conn.comm = temp[i + 1];
+	                            temp[i].execute();        
+	                            conn.last_executed = temp[i];
+	
+	                    
+	                            temp[i].clear();
+	                        }
+	                        else
+	                        {
+	                            conn.comm = temp[i];
+	                            conn.Semi();
+	                            conn.Or();
+	                            conn.And();
+	                            temp[i].clear();
+	                        }
+	                
+	                }
+
+        	}//end of while
+    	}//end of void
+
+        
 };
