@@ -27,8 +27,8 @@ class Rshell : public Command
     
         string input;
         vector<Command> temp;
-		    char username[100];
-		    char hostname[100];
+		char username[100];
+		char hostname[100];
         Connector conn;
         
         //these are the protected member variables of the Rshell Class
@@ -40,17 +40,17 @@ class Rshell : public Command
         Rshell() 
         {
          
-            input = "";
-		        int x = 0;
+		input = "";
+		int x = 0;
 		    
-		        while (x < 100)
-		        {
-		          username[x] = 0;
-		          hostname[x] = 0;
-		          x++;
-		        }
-  		    getlogin_r(username, 100);
-  		    gethostname(hostname, 100);
+	        while (x < 100)
+	        {
+	          username[x] = 0;
+	          hostname[x] = 0;
+	          x++;
+	        }
+	        getlogin_r(username, 100);
+	        gethostname(hostname, 100);
 		    
         }
         
@@ -79,8 +79,6 @@ class Rshell : public Command
 	                            //conn.comm = temp[i + 1];
 	                            temp[i].execute();        
 	                            conn.last_executed = temp[i];
-	
-	                    
 	                            temp[i].clear();
 	                        }
 	                        else
@@ -99,3 +97,4 @@ class Rshell : public Command
 
         
 };
+#endif
