@@ -20,19 +20,16 @@ using namespace std;
 class Connector
 {
     public:
-
-      Command last_executed;//also contains bool of whether this command was an executable or not
-      Command comm;
+        Command last_executed;//also contains bool of whether this command was an executable or not
+        Command comm;
         
-        Connector()
-        {        }
+        Connector();
         
         void Semi()
         {
            // cout << "Semi()\n";
             if (last_executed.connect == ";")
             {
-   
                 comm.execute();
                 last_executed = comm;
             }
