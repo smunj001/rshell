@@ -63,64 +63,6 @@ class Command
         			    exit(EXIT_FAILURE);
                     }
                 }
-				
-				// for(unsigned x = 0; x < this->arg.size(); x++)
-				// {
-				// 	delete[] args[x];
-				// }
-				
-				// delete[] args;
-				//exit(1);
-            
-    //         int pid = fork();
-    //         //wait(NULL);
-            
-    //         if (pid < 0)
-    //         {
-    //             perror("fork() error");
-    //             exit(EXIT_FAILURE);
-    //             // exit(1);
-    //         }
-    //         else if ( pid == 0)
-    //         {
-            	
-    //     	//	executable = true;
-				// if (execvp(args[0], args) == -1)
-				// {
-				// 	perror ("exec");
-				// 	//executable = false;
-				// 	//cout << "set executable = false;" << endl;
-				// 	exit(1);
-				// }
-				// exit(1);
-    //         }
-       //     else
-       //     {
-       //     	int status;
-       //     	if(waitpid(pid, &status, 0) == -1)
-       //     	{
-			    // perror("waitpid");
-			    // exit(1);
-       //         }
-		     //   if (status == 0)
-		        // {
-			    // executable = true;
-		     //   }
-		     //   else
-		     //   {
-			    // executable = false;
-	      //    	}
-           
-       //     }
-            
-            // cout << arg.size() << endl;
-            // arg.clear();
-            // for(int x = 0; x = arg.size(); x++)
-            // {
-            // 	cout << arg.at(x) << " ";
-            // }
-		}
-		
 		//syscalls fork, execvp, and waitpid.
 		
 		void clear()
@@ -257,12 +199,9 @@ class Command
 			}
 			
 			cmds.push_back(c); 
-			
 			//push the rest
 		}
 };
 
 #endif
-
-//check first command and parse it
 
