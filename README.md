@@ -19,6 +19,12 @@ Execution
 *      $ bin/rshell
 
 
-Notes
+Notes / Bugs Encountered
 -----------
-* HW 2 is the foundation of the terminal where the user will be able to enter basic commands such as: echo Hello and RSHELL will react according to the command. 
+* HW 2 is the foundation of the terminal where the user will be able to enter basic commands such as: echo Hello and RSHELL will react according to the command.
+* The boolean values when running the or was wrong.
+* Memory allocation was not properly assigned, therefore we had trouble using the connectors and executing the arguments.
+
+Current Bugs
+-----------
+* The comments works sometimes and in certain scenarios.
