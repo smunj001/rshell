@@ -26,10 +26,7 @@ class Command
 		string connect;
 		int num;
 		
-        Command()
-        {
-        	args = NULL;
-        }
+        
 		void execute()
 		{
 			num = arg.size();		
