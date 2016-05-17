@@ -29,10 +29,10 @@ class Command
         
 		void execute()
 		{
-			num = arg.size();		
+			num = arg.size() + 2;		
 			//number of arguments + cmd + NULL
 			// char* args[num];
-			args = new char*[num + 2];
+			args = new char*[num];
 			// char* args = new char[num];
 			
 			args[0] = ( char* )cmd.c_str();
