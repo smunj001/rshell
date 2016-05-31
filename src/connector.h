@@ -30,39 +30,50 @@ class Connector
             // cout << "Semi()\n";
             if ( last_executed.connect == ";" )
             {
-                // cout << "semi" << endl;
-                comm.execute();
-                last_executed = comm;
-                return false;
+                if ((comm.cmd != "test") && (comm.cmd != "["))
+                {
+                  comm.execute();
+                  last_executed = comm;
+                  return false;
+                }
+                else
+                {
+                  comm.test_exec();
+                  last_executed = comm;
+                  return false;
+                }
             }
             else
-            return true; //continue execution
+            {
+                return true; //continue execution
+            }
         }
         
         bool Or()
         {
-          //  cout << "Or()\n";
-        //   if ( last_executed.executable == false)
-        //   cout << "executable = false(Or statement)" << endl;
-        //   else
-        //   cout << "executable = false" << endl;
-        // last_executed.executable = true;
-            if ( ( last_executed.connect == "||" ) && ( last_executed.executable == false ) )//program enters this if statement even if executable == true
+            if ( ( last_executed.connect == "||" ) && ( last_executed.executable == false ) )
+            //program enters this if statement even if executable == true
             {
-                // cout << "exec next command" << endl;
+                if ( (comm.cmd != "test") && (comm.cmd != "["))
+                {
                 comm.execute();
                 last_executed = comm;
-               // cout << "return false";
                 return false;
                 //Reference: ls ||...||..||...&& echo
                 /* First check the connector,
                     Next need to keep track of the previously executed command
                         If previously executed command is true then 'flag' it
                 */
+                }
+                else
+                {
+                  comm.test_exec();
+                  last_executed = comm;
+                  return false;
+                }
             }
             else if ( ( last_executed.connect == "||" ) && ( last_executed.executable == true ) )
             {
-                // cout << "dont' execute next" << endl;
                 last_executed.connect = comm.connect;
                 return false;
             }
@@ -74,14 +85,22 @@ class Connector
         
         bool And()
         {
-        //   cout << "And()\n";e
             if ( ( last_executed.connect == "&&" ) && ( last_executed.executable == true ) )
             {
                 //last_executed.connect will eventually be different than the 
                 //connect currently be tested
+                if ((comm.cmd != "test") && (comm.cmd != "["))
+                {
                 comm.execute();
                 last_executed = comm;
                 return false;
+                }
+                else
+                {
+                  comm.test_exec();
+                  last_executed = comm;
+                  return false;
+                }
               // sec_comm = false;
             }
             else if ( ( last_executed.connect == "&&" ) && ( last_executed.executable == false ) )
