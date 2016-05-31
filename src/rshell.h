@@ -86,7 +86,17 @@ class Rshell : public Command
                     //if the input is exit then terminate
                 }
                 
-            	parse(input, temp);
+                // Remove Comments
+                for (unsigned int x = 0; x < input.size(); x++)
+                {
+                    if (input.at(x) == '#')
+                    {
+                        input = input.substr(0 , x);
+                        x = input.size();
+                    }
+                }
+                
+            	parse(input, temp);//will need to impliment a parsing section for test command using brackets "[]"
                 //at this point our parse only seperages cmds, args, and connectors if there is a space in between each of them
                     
                     
@@ -96,10 +106,20 @@ class Rshell : public Command
                     {
                         //if first command is being executed
                         //conn.comm = temp[i + 1];
+                        if ( (temp[i].cmd != "test") && (temp[i].cmd != "["))
+                        {
                         temp[i].execute();        
                         conn.last_executed = temp[i];
 
                         temp[i].clear();
+                        }
+                        else
+                        {
+                            temp[i].test_exec();
+                            conn.last_executed = temp[i];
+                            
+                            temp[i].clear();
+                        }
                     }
                     
                     else
@@ -129,6 +149,7 @@ class Rshell : public Command
          
             }//end of while
         }//end of void
+        
 };
 
 
