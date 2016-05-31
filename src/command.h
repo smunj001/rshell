@@ -9,7 +9,6 @@
 #include <cstring>
 #include <string>
 #include <iostream>
-#include <sys/stat.h>
 //#include "rshell.h"
 //#include "connector.h"
 
@@ -18,19 +17,19 @@ using namespace std;
 class Command 
 {
 	private:
-		char** args;//args is the character pointer array of the vector string "arg"
+		char** args;
 		
 	public:
 		string cmd;
 		vector <string> arg;
 		bool executable;
 		string connect;
-		unsigned num;
+		int num;
+		
 		
         
 		void execute()
 		{
-			
 			num = arg.size() + 2;		
 			args = new char*[num];
 			
@@ -48,7 +47,6 @@ class Command
 				The fork is used so that we have a child copy that executes the
 				necessary functions while the parent is not affected nor changed
 			*/
-			
 			
 			args[num - 1] = NULL;
 			
@@ -92,214 +90,8 @@ class Command
 			    exit(EXIT_SUCCESS);
 	        }
 
-        }//end of void execute()
-		
-		void test_exec()
-		{
-			struct stat sb;
-			
-			if (cmd == "[")
-			{
-				num = arg.size() - 1; 
-				// "-1" because we're not going to count "]" as an argument	
-				// but that's only if cmd is "["
-			}
-			else //else if you're using the actual word "test" as a command
-			{
-				num = arg.size();
-			}
-			
-			args = new char*[num];
-			
-			for ( unsigned i = 0; i < num ; i++ )			
-			{
-				args[i] = ( char* )arg[i].c_str();
-			}
-			
-			//stat returns 0 if true, 1 if false;
-			if ( arg[0] == "-d")
-			{
-				pid_t pid = fork();
-				
-				// call and initialize the PID
-				int status;
-	
-	            if ( pid < 0 )
-				{
-					perror ( "Forking Failed\n" );
-					exit ( EXIT_FAILURE );
-				}
-				else if ( pid > 0 )
-				{
-					if ( waitpid( pid, &status, 0 ) == -1 )
-				  	{
-				    	perror( "waitpid" );
-				    	exit( EXIT_FAILURE );
-					}
-				}
-				else if ( pid == 0 )
-				{
-					if (stat(args[1], &sb) == -1)
-					  {
-					  	//perror("stat");
-					  	cout << "(FALSE)" << endl;
-					  	executable = false;
-					  	exit(EXIT_FAILURE);
-					  }
-					else if (stat(args[1], &sb) == 0)  
-					{
-						if (S_ISDIR(sb.st_mode))
-						{
-							cout << "(TRUE)" << endl;
-							executable = true;
-							exit (EXIT_SUCCESS);
-						}
-						else
-						{
-							cout << "(FALSE)" << endl;
-							executable = false;
-							exit (EXIT_FAILURE);
-						}
-					}
-					else if (stat(args[1], &sb) == 1)
-					{
-						cout << "(FALSE)" << endl;
-						executable = false;
-						exit (EXIT_FAILURE);
-					}
-				}
-			
-			}//end of "-d" flag if statement
-			
-			else if ( arg[0] == "-f")
-			{
-				pid_t pid = fork();
-				// call and initialize the PID
-				int status;
-
-				if ( pid < 0 )
-				{
-					perror ( "Forking Failed\n" );
-					exit ( EXIT_FAILURE );
-				}
-				else if ( pid > 0 )
-				{
-					if ( waitpid( pid, &status, 0 ) == -1 )
-				  	{
-				    	perror( "waitpid" );
-				    	exit( EXIT_FAILURE );
-					}
-				}
-				else if ( pid == 0 )
-				{
-				  	if (stat(args[1], &sb) == -1)
-					  {
-					  //	perror("stat");
-					    cout << "(FALSE)" << endl;
-					    executable = false;
-					  	exit(EXIT_FAILURE);
-					  }
-					else if (stat(args[1], &sb) == 0)
-					{
-						if (S_ISREG(sb.st_mode))
-						{
-						cout << "(TRUE)" << endl;
-						executable = true;
-						exit (EXIT_SUCCESS);
-						}
-						else
-						{
-						cout << "(FALSE)" << endl;
-						executable = false;
-						exit (EXIT_FAILURE);
-						}
-					}
-					else if (stat(args[1], &sb) == 1)
-					{
-						cout << "(FALSE)" << endl;
-						executable = false;
-						exit (EXIT_FAILURE);
-					}
-				}
-			}//end of "-f" flag if statement
-			
-			else if ( arg[0] != "-f" && arg[0] != "-d")
-			//which means arg[0] could either be "-e" or no flag at all in which 
-			//case "-e" is used anyway because it is the default
-			{
-					pid_t pid = fork();
-			
-				// call and initialize the PID
-				int status;
-	
-				if ( pid < 0 )
-				{
-					perror ( "Forking Failed\n" );
-					exit ( EXIT_FAILURE );
-				}
-				else if ( pid > 0 )
-				{
-					if ( waitpid( pid, &status, 0 ) == -1 )
-				  	{
-				    	perror( "waitpid" );
-				    	exit( EXIT_FAILURE );
-					}
-				}
-				else if ( pid == 0 )
-				{
-					if (arg[0] != "-e") //if the "-e" flag was not used
-					{
-						if (stat(args[0], &sb) == -1)
-						{
-							cout << "This is where the error is happening when there's no flag." << endl;
-							cout << "(FALSE)" << endl;
-							executable = false;
-							//perror("stat");
-							exit(EXIT_FAILURE);
-						}
-						else if (stat(args[0], &sb) == 0)//if path is a file or directory
-						{
-							cout << "(TRUE)" << endl;
-							executable = true;
-							exit (EXIT_SUCCESS);
-						}
-						else if (stat(args[0], &sb) == 1)//if path is not file or directory
-						{
-							cout << "(FALSE)" << endl;
-							executable = false;
-							exit (EXIT_FAILURE);
-						}
-					}
-					else // if "-e" flag IS used
-					{
-						if (stat(args[1], &sb) == -1)
-						{
-						  
-							//perror("stat");
-							cout << "(FALSE)" << endl;
-							executable = false;
-							exit(EXIT_FAILURE);
-						}
-						else if (stat(args[1], &sb) == 0)
-						{
-							cout << "(TRUE)" << endl;
-							executable = true;
-							exit (EXIT_SUCCESS);
-						}
-						else if (stat(args[1], &sb) == 1)
-						{
-							cout << "(FALSE)" << endl;
-							executable = false;
-							exit (EXIT_FAILURE);
-						}
-					}
-				}
-			}//end of "-e" flag statement
-			
-			//will first start off by writing code for the regular "test" command
-			//we need to see what type of flag it uses
-			//then we need to test the string of the path to the file/directory
-		}//end of test_exec()
+		}
+		//syscalls fork, execvp, and waitpid.
 		
 		void clear()
 		{
@@ -308,10 +100,12 @@ class Command
 			connect.clear();
 		}
 
-		void parse( string& whole_command, vector<Command>& cmds )
+		void parse ( string& whole_command, vector<Command>& cmds )
 		{
 			string input;//tempstring
 			Command c;//tempcommand
+			bool isParen = true;
+
 			
 			/*
 				We will be parsing the command passed by the user. We need the 'input' 
@@ -321,9 +115,10 @@ class Command
 			*/
 			
 			// Need a for loop to help us iterate thorugh the command
-			
+
 			for ( unsigned x = 0; x < whole_command.size(); x++ )
-			{												
+			{	
+				
 				if (whole_command.at(x) == ' ')
 				{
 					//Checking to see whether we have a space at the current index
@@ -357,7 +152,7 @@ class Command
 						if ( whole_command.at( x + 1 ) == '|' )
 						{										
 							// This is to check if we have two ||'s 
-							if ( c.connect.size() > 0 )
+							if( c.connect.size() > 0 )
 							{									
 								cmds.push_back(c);			
 								c.clear();						
@@ -418,18 +213,18 @@ class Command
 					//START NEW IMPLEMENTATION / HW3
 					else if ( whole_command.at(x) == '(' )
 					{
-						//Checks for the Parenthesis / Precedence Order of Operations
-						/* Do not need to check for ')' specifically because '(' is required
-							for ')' */
-					
-						bool isParen = true;
-						int numOParen = 0;//open parenthesis
-						int numCParen = 0;//close parenthesis
+						
+					//Checks for the Parenthesis / Precedence Order of Operations
+					/* Do not need to check for ')' specifically because '(' is required
+						for ')' */
+							
+						int numOParen = 0;
+						int numCParen = 0;
 						unsigned y = x; //assign y the current position
-	       				
-	      				//Count Open and Close ( )
-	      				if(isParen)
-	      				{
+			   			
+			  			//Count Open and Close ( )
+			  			if(isParen)
+			  			{
 				            do
 				            {
 				                if ( whole_command.at(y) == '(' ) 
@@ -441,8 +236,10 @@ class Command
 				                    numCParen++;
 				                }
 				                y++;
+				                x++;
 				            }while ( y < whole_command.size() );
 				            
+				            // cout << numOParen << " " << numCParen << endl;
 				            //Check the count to ensure balanced or print error
 				            if ( numOParen - numCParen != 0 )
 				            {
@@ -457,22 +254,14 @@ class Command
 					            	 return;
 					            }
 				            }
-				            
+				           
 				            isParen = false;
-	      				}
-			            
-						/* We only want to do this once for each command, doing it 
-							multiple times is a waste because result will be the same */
-							
+			  			}
+			  			/* We only want to do this once for each command, doing it 
+						multiple times is a waste because result will be the same */
+						
 						// Time to push the operation onto our vector
-						else
-			            {
-			            	c.connect = whole_command.at(x);
-			            	cmds.push_back(c);
-			            	c.clear();
-			            }
-						
-						
+							parseParen(whole_command, cmds);
 					}
 					
 					//END NEW IMPLEMENTATION / HW3
@@ -481,13 +270,12 @@ class Command
 						input += whole_command.at(x);
 						//input will hold the whole command recieved
 					}
-					
-				}//end of if not a space
-			}//end of for loop
+				}
+			}
 			
 			if ( input.size() > 0 )
 			{												
-				if ( c.cmd.size() != 0 ) // if cmd is not empty
+				if ( c.cmd.size() != 0 )
 				{										
 					c.arg.push_back(input); 				
 				}
@@ -498,7 +286,88 @@ class Command
 			}
 			cmds.push_back(c); 
 			//push the rest
+			
+			
 		}
+		
+		void parseParen(string &whole_command, vector<Command> &cmds)
+		{
+        	string tt;
+        	// vector<Command> parenthcmd;
+        	bool bTrack = true;
+        	int posTrack = 0;
+        	int counter = 0;
+        	
+        	
+        	//Assign x to first instance of '('
+			for(unsigned x = whole_command.find('('); x < whole_command.size(); x++)
+        	{
+        		//Checking for nested loops
+	        	if(whole_command.at(x) == '(')
+	        	{
+	        		counter++;
+	        	}
+	        	
+	        	
+	        	if(whole_command.at(x) == ')' && whole_command.at(whole_command.size() - 1) != ')')
+	        	{
+	        		counter--;
+	        		if ( counter == 0 )
+	        		{
+	        			posTrack = x;
+		        		while(bTrack)
+		        		{
+		        			x--;
+		        			if(whole_command.at(x) == '(' )
+		        			{
+		        				bTrack = false;
+		        				tt = whole_command.substr(x + 1, posTrack - 1);
+		        				if(tt.find(')'))
+		        				{
+		        					tt.erase(tt.find(')'), 1);
+		        				}
+		        				// cout << tt << endl;
+		        				parse(tt, cmds);
+		        			}
+		        			
+		        		}
+	        		}
+	        		else if ( counter < 0 )
+	        		{
+	        			
+	        		}
+	        	}
+	        	else if (whole_command.at(x) == ')' && whole_command.at(whole_command.size() - 1) == ')')
+	        	{
+	        		counter--;
+	        		if ( counter == 0 )
+	        		{
+	        			posTrack = x;
+		        		while(bTrack)
+		        		{
+		        			x--;
+		        			if(whole_command.at(x) == '(' )
+		        			{
+		        				bTrack = false;
+		        				tt = whole_command.substr(x + 1, whole_command.size() - 2);
+		        				if(tt.find(')'))
+		        				{
+		        					tt.erase(tt.find(')'), 1);
+		        				}
+		        				// cout << tt << endl;
+		        				parse(tt, cmds);
+		        			}
+		        			
+		        		}
+	        		}
+	        		else if ( counter < 0 )
+	        		{
+	        			
+	        		}
+	        	}
+        	}
+		}
+		
 };
 
 #endif
