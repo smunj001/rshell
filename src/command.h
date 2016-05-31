@@ -9,6 +9,7 @@
 #include <cstring>
 #include <string>
 #include <iostream>
+#include <sys/stat.h>
 //#include "rshell.h"
 //#include "connector.h"
 
@@ -17,19 +18,19 @@ using namespace std;
 class Command 
 {
 	private:
-		char** args;
+		char** args;//args is the character pointer array of the vector string "arg"
 		
 	public:
 		string cmd;
 		vector <string> arg;
 		bool executable;
 		string connect;
-		int num;
-		
+		unsigned num;
 		
         
 		void execute()
 		{
+			
 			num = arg.size() + 2;		
 			args = new char*[num];
 			
@@ -47,6 +48,7 @@ class Command
 				The fork is used so that we have a child copy that executes the
 				necessary functions while the parent is not affected nor changed
 			*/
+			
 			
 			args[num - 1] = NULL;
 			
@@ -90,8 +92,210 @@ class Command
 			    exit(EXIT_SUCCESS);
 	        }
 
-		}
-		//syscalls fork, execvp, and waitpid.
+        }//end of void execute()
+		
+		void test_exec()
+		{
+			struct stat sb;
+			if (cmd == "[")
+			{
+			num = arg.size() - 1; // "-1" because we're not going to count "]" as an argument	// but that's only if cmd is "["
+			}
+			else //else if you're using the actual word "test" as a command
+			{
+			  num = arg.size();
+			}
+			args = new char*[num];
+			
+			for ( unsigned i = 0; i < num ; i++ )			
+			{
+			  args[i] = ( char* )arg[i].c_str();
+			}
+			
+			//stat returns 0 if true, 1 if false;
+			if ( arg[0] == "-d")
+			{
+				pid_t pid = fork();
+				
+				// call and initialize the PID
+				int status;
+	
+	            if ( pid < 0 )
+				{
+					perror ( "Forking Failed\n" );
+					exit ( EXIT_FAILURE );
+				}
+				else if ( pid > 0 )
+				{
+					if ( waitpid( pid, &status, 0 ) == -1 )
+				  	{
+				    	perror( "waitpid" );
+				    	exit( EXIT_FAILURE );
+					}
+				}
+				else if ( pid == 0 )
+				{
+					if (stat(args[1], &sb) == -1)
+					  {
+					  	//perror("stat");
+					  	cout << "(FALSE)" << endl;
+					  	executable = false;
+					  	exit(EXIT_FAILURE);
+					  }
+					else if (stat(args[1], &sb) == 0)  
+					{
+						if (S_ISDIR(sb.st_mode))
+						{
+							cout << "(TRUE)" << endl;
+							executable = true;
+							exit (EXIT_SUCCESS);
+						}
+						else
+						{
+							cout << "(FALSE)" << endl;
+							executable = false;
+							exit (EXIT_FAILURE);
+						}
+					}
+					else if (stat(args[1], &sb) == 1)
+					{
+						cout << "(FALSE)" << endl;
+						executable = false;
+						exit (EXIT_FAILURE);
+					}
+				}
+			
+			}//end of "-d" flag if statement
+			
+			else if ( arg[0] == "-f")
+			{
+				pid_t pid = fork();
+				// call and initialize the PID
+				int status;
+
+				if ( pid < 0 )
+				{
+					perror ( "Forking Failed\n" );
+					exit ( EXIT_FAILURE );
+				}
+				else if ( pid > 0 )
+				{
+					if ( waitpid( pid, &status, 0 ) == -1 )
+				  	{
+				    	perror( "waitpid" );
+				    	exit( EXIT_FAILURE );
+					}
+				}
+				else if ( pid == 0 )
+				{
+				  	if (stat(args[1], &sb) == -1)
+					  {
+					  //	perror("stat");
+					    cout << "(FALSE)" << endl;
+					    executable = false;
+					  	exit(EXIT_FAILURE);
+					  }
+					else if (stat(args[1], &sb) == 0)
+					{
+						if (S_ISREG(sb.st_mode))
+						{
+						cout << "(TRUE)" << endl;
+						executable = true;
+						exit (EXIT_SUCCESS);
+						}
+						else
+						{
+						cout << "(FALSE)" << endl;
+						executable = false;
+						exit (EXIT_FAILURE);
+						}
+					}
+					else if (stat(args[1], &sb) == 1)
+					{
+						cout << "(FALSE)" << endl;
+						executable = false;
+						exit (EXIT_FAILURE);
+					}
+				}
+			}//end of "-f" flag if statement
+			
+			else if ( arg[0] != "-f" && arg[0] != "-d")
+			//which means arg[0] could either be "-e" or no flag at all in which 
+			//case "-e" is used anyway because it is the default
+			{
+					pid_t pid = fork();
+			
+				// call and initialize the PID
+				int status;
+	
+				if ( pid < 0 )
+				{
+					perror ( "Forking Failed\n" );
+					exit ( EXIT_FAILURE );
+				}
+				else if ( pid > 0 )
+				{
+					if ( waitpid( pid, &status, 0 ) == -1 )
+				  	{
+				    	perror( "waitpid" );
+				    	exit( EXIT_FAILURE );
+					}
+				}
+				else if ( pid == 0 )
+				{
+					if (arg[0] != "-e") //if the "-e" flag was not used
+					{
+						if (stat(args[0], &sb) == -1)
+						{
+							cout << "This is where the error is happening when there's no flag." << endl;
+							cout << "(FALSE)" << endl;
+							executable = false;
+							//perror("stat");
+							exit(EXIT_FAILURE);
+						}
+						else if (stat(args[0], &sb) == 0)//if path is a file or directory
+						{
+							cout << "(TRUE)" << endl;
+							executable = true;
+							exit (EXIT_SUCCESS);
+						}
+						else if (stat(args[0], &sb) == 1)//if path is not file or directory
+						{
+							cout << "(FALSE)" << endl;
+							executable = false;
+							exit (EXIT_FAILURE);
+						}
+					}
+					else // if "-e" flag IS used
+					{
+						if (stat(args[1], &sb) == -1)
+						{
+						  
+							//perror("stat");
+							cout << "(FALSE)" << endl;
+							executable = false;
+							exit(EXIT_FAILURE);
+						}
+						else if (stat(args[1], &sb) == 0)
+						{
+							cout << "(TRUE)" << endl;
+							executable = true;
+							exit (EXIT_SUCCESS);
+						}
+						else if (stat(args[1], &sb) == 1)
+						{
+							cout << "(FALSE)" << endl;
+							executable = false;
+							exit (EXIT_FAILURE);
+						}
+					}
+				}
+			}//end of "-e" flag statement
+			
+			//will first start off by writing code for the regular "test" command
+			//we need to see what type of flag it uses
+			//then we need to test the string of the path to the file/directory
+		}//end of test_exec()
 		
 		void clear()
 		{
@@ -367,7 +571,6 @@ class Command
 	        	}
         	}
 		}
-		
 };
 
 #endif
