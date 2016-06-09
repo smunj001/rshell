@@ -221,7 +221,7 @@ class Command
 						else if ( pid == 0)
 					    {
 					    	int fd = open(arg[i].c_str() , O_WRONLY|O_TRUNC); 
-						    int stdout = dup(1);
+						    // int stdout = dup(1);
 						    close(1);
 							dup2(fd,1);
 							
@@ -279,7 +279,7 @@ class Command
 						else if ( pid == 0)
 					    {
 					    	int fd = open(arg[i].c_str() , O_WRONLY|O_APPEND); 
-						    int stdout = dup(1);
+						    // int stdout = dup(1);
 						    close(1);
 							dup2(fd,1);
 							
