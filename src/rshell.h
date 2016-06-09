@@ -95,12 +95,12 @@ class Rshell : public Command
                         x = input.size();
                     }
                 }
-                
             	parse(input, temp);//will need to impliment a parsing section for test command using brackets "[]"
                 //at this point our parse only seperages cmds, args, and connectors if there is a space in between each of them
                     
-                    
-                for ( unsigned i = 0; i < temp.size(); i++ )
+                
+               // cout << "just to see how quickly changes are being saved115" << endl;
+                for ( unsigned i = 0; i < temp.size(); i++ )//I"m thinking we should make temp a 2-d vector. first bracket would be a specific set of commands inside a pair of parenthesis and the second pair of brackets would hold all the commands inside that pair of parenthesis
                 {
                     if ( i == 0 )
                     {
@@ -108,12 +108,25 @@ class Rshell : public Command
                         //conn.comm = temp[i + 1];
                         if ( (temp[i].cmd != "test") && (temp[i].cmd != "["))
                         {
-                        temp[i].execute();        
-                        conn.last_executed = temp[i];
-
-                        temp[i].clear();
+                            if (temp[i].connect != "|")//if we're not piping
+                            {
+                            temp[i].execute();        
+                            conn.last_executed = temp[i];
+                            if(temp[i].executable == true)
+                           // cout << "last_executed.executable = true " << endl;
+                            temp[i].clear();
+                            }
+                            else if (temp[i].connect == "|")//still need to implement if a "test" command is going to be piped
+                            {
+                                conn.last_executed = temp[i];//.executable still has not value here
+                                conn.comm = temp[i + 1];
+                                conn.Pipe();
+                                temp[i].clear();
+                                i++;
+                                temp[i].clear();
+                            }
                         }
-                        else
+                        else//still need to come up with case if the test command gets piped into another
                         {
                             temp[i].test_exec();
                             conn.last_executed = temp[i];
@@ -121,12 +134,19 @@ class Rshell : public Command
                             temp[i].clear();
                         }
                     }
-                    
-                    else
+                     else//if we're not executing the first command... i > 0
                     {
                         conn.comm = temp[i];
                          cont = true;
                         
+                        // all of these are going to check if conn.comm is to be executed
+                        //if it is to be executed then we also need to check if the next connector
+                        //is a pipe. If it is then implement pipe.
+                        //If not then continue to execute like a normal command
+                        //implimentation for pipe will need to go inside each of these member functions
+                        if (temp[i].connect != "|")//if we're not piping the current command
+                        {
+                            
                         if ( cont )
                         {
                             cont = conn.Semi();
@@ -143,9 +163,19 @@ class Rshell : public Command
                         }
                         
                         temp[i].clear();
-                    }
+                        }
+                        else if (temp[i].connect == "|")//if we need to pipe the current command
+                        {
+                            conn.last_executed = temp[i];
+                            conn.comm = temp[i + 1];
+                            conn.Pipe();
+                            temp[i].clear();
+                            i++;
+                            temp[i].clear(); 
+                        }
+                    }//end of else statement... else=commands that are after the first index
                 
-                }
+                }//end of for loop for executing commands
          
             }//end of while
         }//end of void
