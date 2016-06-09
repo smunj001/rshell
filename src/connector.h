@@ -51,8 +51,9 @@ class Connector
         
         bool Or()
         {
+            // if (last_executed.executable == true)
+            //     cout << "executable is true here" << endl;
             if ( ( last_executed.connect == "||" ) && ( last_executed.executable == false ) )
-            //program enters this if statement even if executable == true
             {
                 if ( (comm.cmd != "test") && (comm.cmd != "["))
                 {
@@ -110,6 +111,59 @@ class Connector
             }
             
             return true;
+        }
+        
+        void Pipe()
+        {
+            if ( last_executed.connect == "|" ) //might have to create a error check to see if commnad to be piped is actually an executable
+            {
+
+                
+                int returnValue = fork();
+                if ( returnValue < 0)
+                {
+                     perror ( "Forking Failed\n" );
+				     exit ( EXIT_FAILURE );
+                }
+                else if ( returnValue == 0)//child process
+                {
+                    int pfd[2];
+                    pipe(pfd);
+                    int newChild = fork();
+                    if ( newChild < 0)
+                    {
+				      perror ( "Forking Failed\n" );
+				      exit ( EXIT_FAILURE );
+			        }
+                    else if ( newChild == 0)//child of the child proccess
+                    {
+                        close(pfd[0]);
+                        close(1);
+                        dup(pfd[1]);
+                        close(pfd[1]);
+                        last_executed.beingpiped = true;
+                        last_executed.execute(); 
+                        exit(EXIT_SUCCESS);
+                    }
+                    else if (newChild > 0)//parent of the child's child... aka child proccess
+                    {
+                        wait(NULL);
+                        close(pfd[1]);
+                        close(0);
+                        dup(pfd[0]);
+                        close(pfd[0]);
+                        comm.beingpiped = true;
+                        comm.execute();
+                    }
+                    exit(EXIT_SUCCESS);
+                }
+                else if (returnValue > 0)
+                {
+                    wait(NULL);
+                    last_executed = comm;
+                    
+                }
+            }
         }
 };
 
