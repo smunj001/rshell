@@ -2,8 +2,6 @@
 #include <iostream>
 using namespace std;
 
-
-
 int main()
 {
     Rshell newTerminal;
