@@ -27,4 +27,7 @@ Notes / Bugs Encountered
 
 Current Bugs
 -----------
-* The comments works sometimes and in certain scenarios.
+* The comments works sometimes and in certain scenarios. //Fixed
+* We have not been able to implement the precedence operation so we took it out of the program
+* Few bugs while using dup with redirection
+* Piping changed the value of executable to true when it should be false after child process exits. We're able to resolve the issue but could not identify why or where the value was being changed.
